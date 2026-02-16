@@ -113,6 +113,8 @@ https://github.com/MDMonirujjaman805/SwiftCart_E-Commerce
 5 === "5"; // false (কারণ একটি Number অন্যটি String)
 ```
 
+---
+
 ## 4️⃣ API fetch করার ক্ষেত্রে async/await এর গুরুত্ব কী?
 
 জাভাস্ক্রিপ্ট ডিফল্টভাবে সিনক্রোনাস। কিন্তু API থেকে ডাটা আসতে সময় লাগে। async/await এর গুরুত্ব হলো:
@@ -122,6 +124,8 @@ Readable Code: এটি এসিনক্রোনাস কোডকে
 Execution Control: await কিউওয়ার্ড ব্যবহার করলে কোড ততক্ষণ অপেক্ষা করে যতক্ষণ না ডাটা সফলভাবে আসে।
 
 Error Handling: try...catch ব্লক ব্যবহার করে খুব সহজে এরর হ্যান্ডেল করা যায়।
+
+---
 
 ## 5️⃣ JavaScript এ Scope ব্যাখ্যা করো
 
