@@ -6,10 +6,10 @@ This project dynamically loads products from FakeStore API and allows users to b
 ---
 
 ## 🔗 Live Demo
-(Add your live link here if deployed)
+
 
 ## 📁 GitHub Repository
-(Add your repository link here)
+https://github.com/MDMonirujjaman805/SwiftCart_E-Commerce
 
 ---
 
@@ -67,4 +67,4 @@ This project dynamically loads products from FakeStore API and allows users to b
 
 1. Clone the repository:
    ```bash
-   git clone your-repo-link
+   git clone https://github.com/MDMonirujjaman805/SwiftCart_E-Commerce
