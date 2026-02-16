@@ -7,6 +7,10 @@ This project dynamically loads products from FakeStore API and allows users to b
 
 ## 🔗 Live Demo
 
+https://swift-cart-e-commerce-livid.vercel.app/
+
+---
+
 ## 📁 GitHub Repository
 
 https://github.com/MDMonirujjaman805/SwiftCart_E-Commerce
