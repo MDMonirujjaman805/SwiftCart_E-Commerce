@@ -2,109 +2,175 @@ import { getCategories, getProductsByCategory, getAllProducts } from "./api.js";
 import { renderCategories, renderProducts } from "./ui.js";
 import { updateCartCount } from "./cart.js";
 
+// Loader
+const loader = document.getElementById("global-loader");
+
+const showLoader = () => {
+  loader?.classList.remove("hidden");
+};
+
+const hideLoader = () => {
+  loader?.classList.add("hidden");
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
-  updateCartCount();
+  try {
+    showLoader();
 
-  const categories = await getCategories();
-  const products = await getAllProducts();
+    updateCartCount();
 
-  renderCategories(categories, loadProducts, loadAllProducts);
-  renderProducts(products);
+    const [categories, products] = await Promise.all([
+      getCategories(),
+      getAllProducts(),
+    ]);
 
-  const trending = products
-    .sort((a, b) => b.rating.rate - a.rating.rate)
-    .slice(0, 4);
+    renderCategories(categories, loadProducts, loadAllProducts);
+    renderProducts(products);
 
-  renderTrending(trending);
+    const trending = [...products]
+      .sort((a, b) => b?.rating?.rate - a?.rating?.rate)
+      .slice(0, 4);
 
-  showHome();
+    renderTrending(trending);
 
-  document.getElementById("nav-home").addEventListener("click", showHome);
-  document
-    .getElementById("nav-products")
-    .addEventListener("click", showProducts);
+    initNavigation();
+    showHome();
+  } catch (error) {
+    console.error("App Initialization Failed:", error.message);
+  } finally {
+    hideLoader();
+  }
 });
 
-async function loadProducts(category) {
-  const products = await getProductsByCategory(category);
-  renderProducts(products);
-}
+// Products Loading
+const loadProducts = async (category) => {
+  try {
+    showLoader();
 
-async function loadAllProducts() {
-  const products = await getAllProducts();
-  renderProducts(products);
-}
+    const products = await getProductsByCategory(category);
+    renderProducts(products);
+    showProducts();
+  } catch (error) {
+    console.error("Failed to load category products:", error.message);
+  } finally {
+    hideLoader();
+  }
+};
 
-function renderTrending(products) {
+const loadAllProducts = async () => {
+  try {
+    showLoader();
+
+    const products = await getAllProducts();
+    renderProducts(products);
+    showProducts();
+  } catch (error) {
+    console.error("Failed to load all products:", error.message);
+  } finally {
+    hideLoader();
+  }
+};
+
+//  Trending Section
+const renderTrending = (products = []) => {
   const container = document.getElementById("trending-container");
+  if (!container) return;
+
   container.innerHTML = "";
+  const fragment = document.createDocumentFragment();
 
   products.forEach((product) => {
-    container.innerHTML += `<div>
+    const { title, price, image, category, rating = {} } = product;
+
+    const { rate = 0, count = 0 } = rating;
+
+    const card = document.createElement("div");
+    card.className = "card bg-base-100 shadow-xl";
+
+    card.innerHTML = `
       <figure class="p-4 bg-slate-200">
-        <img src="${product.image}" class="h-40 object-contain"/>
+        <img src="${image}" class="h-40 object-contain" alt="${title}" />
       </figure>
-      <div class="card-body ">
-      <div class=" flex justify-between">
-      <span class="text-blue-800">${product.category}</span>
-      <div class="flex justify-between gap-1"><span>${product.rating.rate}</span> <span>(${product.rating.count})</span></div>
-      </div>
-        <h2 class="card-title text-sm">
-          ${product.title.slice(0, 40)}...
-        </h2>
-        <p class="font-bold">$${product.price}</p>
-        <div class="flex justify-between items-center">
-        <button class="btn btn-sm btn-outline details-btn">Details</button>
-        <button class=" btn btn-sm btn-primary add-btn " >Add</button>
+      <div class="card-body">
+        <div class="flex justify-between">
+          <span class="text-blue-800">${category}</span>
+          <div class="flex gap-1">
+            <span>${rate}</span>
+            <span>(${count})</span>
+          </div>
         </div>
-      </div>
+        <h2 class="card-title text-sm">
+          ${title?.slice(0, 40) || "No Title"}...
+        </h2>
+        <p class="font-bold">$${price}</p>
       </div>
     `;
+
+    fragment.appendChild(card);
   });
-}
 
-function showHome() {
-  document.getElementById("home-section").classList.remove("hidden");
-  document.getElementById("features-section").classList.remove("hidden");
-  document.getElementById("trending-section").classList.remove("hidden");
+  container.appendChild(fragment);
+};
 
-  document.getElementById("products-section").classList.add("hidden");
+//  Navigation
+const showHome = () => {
+  toggleSection({
+    home: true,
+    features: true,
+    trending: true,
+    products: false,
+  });
 
-  window.scrollTo(0, 0);
-}
+  setActiveNav("nav-home");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
-function showProducts() {
-  document.getElementById("home-section").classList.add("hidden");
-  document.getElementById("features-section").classList.add("hidden");
-  document.getElementById("trending-section").classList.add("hidden");
+const showProducts = () => {
+  toggleSection({
+    home: false,
+    features: false,
+    trending: false,
+    products: true,
+  });
 
-  document.getElementById("products-section").classList.remove("hidden");
+  setActiveNav("nav-products");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
-  window.scrollTo(0, 0);
-}
+const toggleSection = ({ home, features, trending, products }) => {
+  const sections = {
+    "home-section": home,
+    "features-section": features,
+    "trending-section": trending,
+    "products-section": products,
+  };
 
-function setActiveNav(activeId) {
+  Object.entries(sections).forEach(([id, show]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle("hidden", !show);
+  });
+};
+
+const setActiveNav = (activeId) => {
   document
     .querySelectorAll(".menu a")
     .forEach((link) => link.classList.remove("font-bold", "text-primary"));
 
-  document.getElementById(activeId).classList.add("font-bold", "text-primary");
-}
+  const active = document.getElementById(activeId);
+  active?.classList.add("font-bold", "text-primary");
+};
 
-document.getElementById("nav-home").addEventListener("click", () => {
-  showHome();
-  setActiveNav("nav-home");
-});
+const initNavigation = () => {
+  const navMap = {
+    "nav-home": showHome,
+    "nav-products": showProducts,
+    "mobile-nav-home": showHome,
+    "mobile-nav-products": showProducts,
+  };
 
-document.getElementById("nav-products").addEventListener("click", () => {
-  showProducts();
-  setActiveNav("nav-products");
-});
-
-document.getElementById("mobile-nav-home").addEventListener("click", () => {
-  showHome();
-});
-
-document.getElementById("mobile-nav-products").addEventListener("click", () => {
-  showProducts();
-});
+  Object.entries(navMap).forEach(([id, handler]) => {
+    const el = document.getElementById(id);
+    el?.addEventListener("click", handler);
+  });
+};

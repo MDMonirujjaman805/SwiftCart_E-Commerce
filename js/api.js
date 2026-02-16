@@ -1,16 +1,46 @@
 const BASE_URL = "https://fakestoreapi.com/products";
 
-export async function getCategories() {
-  const res = await fetch(`${BASE_URL}/categories`);
-  return await res.json();
-}
+export const getCategories = async () => {
+  try {
+    const res = await fetch(`${BASE_URL}/categories`);
 
-export async function getProductsByCategory(category) {
-  const res = await fetch(`${BASE_URL}/category/${category}`);
-  return await res.json();
-}
+    if (!res.ok) {
+      throw new Error("Failed to fetch categories");
+    }
 
-export async function getAllProducts() {
-  const res = await fetch(BASE_URL);
-  return await res.json();
-}
+    return await res.json();
+  } catch (error) {
+    console.error("Error in getCategories:", error.message);
+    throw error;
+  }
+};
+
+export const getProductsByCategory = async (category) => {
+  try {
+    const res = await fetch(`${BASE_URL}/category/${category}`);
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch products by category");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Error in getProductsByCategory:", error.message);
+    throw error;
+  }
+};
+
+export const getAllProducts = async () => {
+  try {
+    const res = await fetch(BASE_URL);
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch products");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Error in getAllProducts:", error.message);
+    throw error;
+  }
+};
